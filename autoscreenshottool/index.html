@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Screenshot Tool</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f4f4;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.container{
+    width:400px;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+h2{
+    text-align:center;
+}
+input{
+    width:100%;
+    padding:8px;
+    margin:8px 0;
+}
+button{
+    width:48%;
+    padding:10px;
+    margin-top:10px;
+    cursor:pointer;
+}
+#log{
+    margin-top:15px;
+    height:180px;
+    overflow:auto;
+    border:1px solid #ccc;
+    padding:10px;
+    background:#fafafa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Auto Screenshot Tool</h2>
+
+<label>Folder Name</label>
+<input type="text" id="folder" value="screenshots">
+
+<label>Interval (Seconds)</label>
+<input type="number" id="interval" value="2">
+
+<label>Total Screenshots</label>
+<input type="number" id="total" value="10">
+
+<button onclick="startCapture()">Start</button>
+<button onclick="stopCapture()">Stop</button>
+
+<div id="log"></div>
+
+</div>
+
+<script>
+
+async function startCapture(){
+
+await fetch("/start",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+folder:document.getElementById("folder").value,
+interval:parseInt(document.getElementById("interval").value),
+total:parseInt(document.getElementById("total").value)
+})
+});
+
+}
+
+async function stopCapture(){
+
+await fetch("/stop",{
+method:"POST"
+});
+
+}
+
+async function updateStatus(){
+
+const res=await fetch("/status");
+const data=await res.json();
+
+let text="";
+
+data.log.forEach(item=>{
+text+=item.msg+"<br>";
+});
+
+document.getElementById("log").innerHTML=text;
+
+}
+
+setInterval(updateStatus,1000);
+
+</script>
+
+</body>
+</html>
